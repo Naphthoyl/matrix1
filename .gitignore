@@ -1,2 +1,5 @@
 build/
 app
+
+tests/doctest.h
+doctest.h

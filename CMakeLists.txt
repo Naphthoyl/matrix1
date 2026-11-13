@@ -16,3 +16,6 @@ target_link_libraries(app PRIVATE list matrix)
 
 
 configure_file(text.txt ${CMAKE_BINARY_DIR}/text.txt COPYONLY)
+
+add_executable(test test.cpp)
+target_link_libraries(test PRIVATE list matrix)
