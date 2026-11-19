@@ -3,12 +3,7 @@
 #include <iostream>
 
 template <typename T>
-List<T>::List() {
-    base.prev = &base;
-    base.next = &base;
-    before = &base;
-    after = &base;
-}
+List<T>::List(): head(nullptr), tail(nullptr), before(nullptr), after(nullptr) {}
 
 template <typename T>
 List<T>::~List() {
@@ -20,55 +15,63 @@ List<T>::~List() {
 
 template <typename T>
 int List<T>::ins_before(Matrix<T>& m) {
-    Node<T> *new_node = nullptr;
+    std::unique_ptr<Node<T>> new_node;
     try {
-        new_node = new Node<T>(m);
+        new_node = std::make_unique<Node<T>>(m);
     }
     catch (...) {
         return -1;
     }
 
+    Node<T> *raw = new_node.get();
+    std::unique_ptr<Node<T>>& slot = before ? before->next :head;
+
     new_node->prev = before;
-    new_node->next = after;
-    before->next = new_node;
-    after->prev = new_node;
-    before = new_node;
+    new_node->next = std::move(slot);
+    if (after) after->prev = raw;
+    else tail = raw;
+    slot = std::move(new_node);
+    before = raw;
     return 0;
 }
 
 template <typename T>
 int List<T>::ins_after(Matrix<T>& m) {
-    Node<T> *new_node = nullptr;
+    std::unique_ptr<Node<T>> new_node;
     try {
-        new_node = new Node<T>(m);
+        new_node = std::make_unique<Node<T>>(m);
     }
     catch (...) {
         return -1;
     }
 
+    Node<T> *raw = new_node.get();
+    std::unique_ptr<Node<T>>& slot = before ? before->next : head;
+
     new_node->prev = before;
-    new_node->next = after;
-    before->next = new_node;
-    after->prev = new_node;
-    after = new_node;
+    new_node->next = std::move(slot);
+    if (after) after->prev = raw;
+    else tail = raw;
+    slot = std::move(new_node);
+    after = raw;
     return 0;
 }
 
 template <typename T>
 int List<T>::at_beg() {
-    if (before == &base) return 1;
+    if (before == nullptr) return 1;
     else return 0;
 }
 
 template <typename T>
 int List<T>::at_end() {
-    if (after == &base) return 1;
+    if (after == nullptr) return 1;
     else return 0;
 }
 
 template <typename T>
 int List<T>::is_empty() {
-    if (base.next == &base) return 1;
+    if (head == nullptr) return 1;
     else return 0;
 }
 
@@ -76,13 +79,13 @@ template <typename T>
 int List<T>::del_before() {
     if (at_beg()) return -1;
 
-    Node<T> *del = before;
-    Node<T> *l = del->prev;
-    Node<T> *r = del->next;
-    l->next = r;
-    r->prev = l;
+    Node<T> *l = before->prev;
+    std::unique_ptr<Node<T>>& slot = l ? l->next : head;
+    std::unique_ptr<Node<T>> node_to_del = std::move(slot);
+    slot = std::move(node_to_del->next);
+    if (slot) slot->prev = l;
+    else tail = l;
     before = l;
-    delete del;
     return 0;
 }
 
@@ -90,13 +93,13 @@ template <typename T>
 int List<T>::del_after() {
     if (at_end()) return -1;
 
-    Node<T> *del = after;
-    Node<T> *l = del->prev;
-    Node<T> *r = del->next;
-    l->next = r;
-    r->prev = l;
-    after = r;
-    delete del;
+    Node<T> *l = after->prev;
+    std::unique_ptr<Node<T>>& slot = l ? l->next : head;
+    std::unique_ptr<Node<T>> node_to_del = std::move(slot);
+    slot = std::move(node_to_del->next);
+    if (slot) slot->prev = l;
+    else tail = l;
+    after = slot.get();
     return 0;
 }
 
@@ -137,7 +140,7 @@ int List<T>::step_forward() {
     if (at_end()) return -1;
 
     before = after;
-    after = before->next;
+    after = before->next.get();
     return 0;
 }
 
@@ -152,41 +155,33 @@ int List<T>::step_backward() {
 
 template <typename T>
 void List<T>::go_to_beg() {
-    before = &base;
-    after = before->next;
+    before = nullptr;
+    after = head.get();
 }
 
 template <typename T>
 void List<T>::go_to_end() {
-    after = &base;
-    before = after->prev;
+    after = nullptr;
+    before = tail;
 }
 
 template <typename T>
 void List<T>::show() {
-    Node<T>* cur = base.next;
-    while (cur != &base) {
+    for (Node<T> *cur = head.get(); cur != nullptr; cur = cur->next.get()) {
         cur->data.show();
         if (cur == before) std::cout << " <-before";
         if (cur == after) std::cout << " <-after";
-        cur = cur->next;
         std::cout << std::endl;
     }
 }
 
 template <typename T>
-List<T>::List(const List<T>& other) {
-    base.prev = &base;
-    base.next = &base;
-    before = &base;
-    after = &base;
+List<T>::List(const List<T>& other) : head(nullptr), tail(nullptr), before(nullptr), after(nullptr) {
+    Node<T> *new_before = nullptr;
+    Node<T> *new_after = nullptr;
 
-    Node<T> *new_before = &base;
-    Node<T> *new_after = &base;
 
-    go_to_end();
-
-    for (Node<T> *temp = other.base.next; temp != &other.base; temp = temp->next) {
+    for (Node<T> *temp = other.head.get(); temp != nullptr; temp = temp->next.get()) {
         if (ins_before(temp->data) == -1) {
             go_to_beg();
             while (!is_empty()) del_after();
@@ -199,11 +194,9 @@ List<T>::List(const List<T>& other) {
         if (temp == other.after) new_after = new_node;
     }
 
-    if (other.before == &other.base) before = &base;
-    else before = new_before;
+    before = new_before;
+    after = new_after;
 
-    if (other.after == &other.base) after = &base;
-    else after = new_after;
 }
 
 template <typename T>
@@ -213,17 +206,10 @@ List<T>& List<T>::operator=(const List& other) {
     go_to_beg();
     while (!is_empty()) del_after();
 
-    base.prev = &base;
-    base.next = &base;
-    before = &base;
-    after = &base;
+    Node<T> *new_before = nullptr;
+    Node<T> *new_after = nullptr;
 
-    Node<T> *new_before = &base;
-    Node<T> *new_after = &base;
-
-    go_to_end();
-
-    for (Node<T> *temp = other.base.next; temp != &other.base; temp = temp->next) {
+    for (Node<T> *temp = other.head.get(); temp != nullptr; temp = temp->next.get()) {
         if (ins_before(temp->data) == -1) {
             go_to_beg();
             while (!is_empty()) del_after();
@@ -236,11 +222,8 @@ List<T>& List<T>::operator=(const List& other) {
         if (temp == other.after) new_after = new_node;
     }
 
-    if (other.before == &other.base) before = &base;
-    else before = new_before;
-
-    if (other.after == &other.base) after = &base;
-    else after = new_after;
+    before = new_before;
+    after = new_after;
 
     return *this;
 }
@@ -263,7 +246,7 @@ int List<T>::mul(Matrix<T>& result) {
 
 template <typename T>
 int List<T>::sled() {
-    for (Node<T> *temp = base.next; temp != &base; temp = temp->next) {
+    for (Node<T> *temp = head.get(); temp != nullptr; temp = temp->next.get()) {
         temp->data.sledMatrix();
     }
     return 0;

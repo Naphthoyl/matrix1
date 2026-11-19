@@ -6,7 +6,8 @@
 
 template <typename T>
 class List {
-    Node<T> base;
+    std::unique_ptr<Node<T>> head;
+    Node<T> *tail;
     Node<T> *before, *after;
 
 public:

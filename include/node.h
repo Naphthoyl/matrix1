@@ -10,7 +10,8 @@ class List;
 template <typename T>
 class Node {
     Matrix<T> data;
-    Node *prev, *next;
+    Node *prev;
+    std::unique_ptr<Node> next;
     friend class List<T>;
 
 public:

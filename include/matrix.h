@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <memory>
 
 template <typename T>
 class List;
@@ -14,14 +15,14 @@ template <typename T>
 class Matrix {
 private:
     int n;
-    T** a;
+   std::unique_ptr<std::unique_ptr<T[]>[]>a;
     friend class List<T>;
     friend class Node<T>;
 
 public:
     Matrix();
     Matrix(int size);
-    ~Matrix();
+    ~Matrix() = default;
     Matrix(const Matrix& other);
     Matrix& operator=(const Matrix& other);
 

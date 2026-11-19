@@ -9,87 +9,40 @@ Matrix<T>::Matrix() : n(0), a(nullptr) {
 
 template <typename T>
 Matrix<T>::Matrix(int size) : n(size), a(nullptr) {
-    try {
-        a = new T*[n];
+    try{
+        a = std::make_unique<std::unique_ptr<T[]>[]>(n);
         for (int i = 0; i < n; i++) {
-            a[i] = nullptr;
+            a[i] = std::make_unique<T[]>(n);
         }
+    }
+    catch (...){
+       n = 0;
+        a.reset();
 
-        try {
-            for (int i = 0; i < n; i++) {
-                a[i] = new T[n];
-                for (int j = 0; j < n; j++) {
-                    a[i][j] = T();
-                }
-            }
-        }
-        catch (...) {
-            for (int i = 0; i < n; i++) {
-                delete[] a[i];
-            }
-            delete[] a;
-            n = 0;
-            a = nullptr;
-            return;
-        }
     }
-    catch (...) {
-        delete[] a;
-        n = 0;
-        a = nullptr;
-        return;
-    }
-}
 
-template <typename T>
-Matrix<T>::~Matrix() {
-    if (a != nullptr) {
-        for (int i = 0; i < n; i++) {
-            if (a[i]) {
-                delete[] a[i];
-            }
-        }
-        delete[] a;
-    }
 }
 
 template <typename T>
 Matrix<T>::Matrix(const Matrix<T>& other) : n(other.n), a(nullptr) {
     if (other.a == nullptr || other.n == 0) {
         n = 0;
-        a = nullptr;
         return;
     }
 
     try {
-        a = new T*[n];
+        a = std::make_unique<std::unique_ptr<T[]>[]>(n);
         for (int i = 0; i < n; i++) {
-            a[i] = nullptr;
-        }
-
-        try {
-            for (int i = 0; i < n; i++) {
-                a[i] = new T[n];
-                for (int j = 0; j < n; j++) {
-                    a[i][j] = other.a[i][j];
-                }
+            a[i] = std::make_unique<T[]>(n);
+            for (int j = 0; j < n; j++) {
+                a[i][j] = other.a[i][j];
             }
-        }
-        catch (...) {
-            for (int i = 0; i < n; i++) {
-                delete[] a[i];
-            }
-            delete[] a;
-            n = 0;
-            a = nullptr;
-            return;
         }
     }
+
     catch (...) {
-        delete[] a;
         n = 0;
-        a = nullptr;
-        return;
+        a.reset();
     }
 }
 
@@ -99,53 +52,28 @@ Matrix<T>& Matrix<T>::operator=(const Matrix<T>& other) {
         return *this;
     }
 
-    if (a != nullptr) {
-        for (int i = 0; i < n; i++) {
-            if (a[i]) {
-                delete[] a[i];
-            }
-        }
-        delete[] a;
-    }
-
-    n = other.n;
-    a = nullptr;
+    a.reset();
+    n=other.n;
 
     if (other.a == nullptr || other.n == 0) {
         n = 0;
-        a = nullptr;
         return *this;
     }
 
-    try {
-        a = new T*[n];
-        for (int i = 0; i < n; i++) {
-            a[i] = nullptr;
-        }
-
-        try {
-            for (int i = 0; i < n; i++) {
-                a[i] = new T[n];
-                for (int j = 0; j < n; j++) {
-                    a[i][j] = other.a[i][j];
-                }
+    try{
+        a = std::make_unique<std::unique_ptr<T[]>[]>(n);
+        for (int i = 0; i < n; i++){
+            a[i]= std::make_unique<T[]>(n);
+            for (int j = 0; j < n; j++)
+            {
+                a[i][j] = other.a[i][j];
             }
-        }
-        catch (...) {
-            for (int i = 0; i < n; i++) {
-                delete[] a[i];
-            }
-            delete[] a;
-            n = 0;
-            a = nullptr;
-            return *this;
         }
     }
+
     catch (...) {
-        delete[] a;
         n = 0;
-        a = nullptr;
-        return *this;
+        a.reset();
     }
     return *this;
 }
