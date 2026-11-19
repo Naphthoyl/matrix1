@@ -5,15 +5,15 @@
 #include "list.h"
 
 TEST_CASE("List: new list is empty") {
-    List l;
+    List<int> l;
     CHECK(l.is_empty() == 1);
     CHECK(l.at_beg() == 1);
     CHECK(l.at_end() == 1);
 }
 
 TEST_CASE("List: insertion") {
-    List l;
-    Matrix a(2);
+    List<int> l;
+    Matrix<int> a(2);
 
     SUBCASE("ins_before") {
         CHECK(l.ins_before(a) == 0);
@@ -31,8 +31,8 @@ TEST_CASE("List: insertion") {
 }
 
 TEST_CASE("List: moving the cursors") {
-    List l;
-    Matrix a(2);
+    List<int> l;
+    Matrix<int> a(2);
     for (int i = 0; i < 3; ++i) {
         REQUIRE(l.ins_before(a) == 0);
     }
@@ -60,8 +60,8 @@ TEST_CASE("List: moving the cursors") {
 }
 
 TEST_CASE("List: get and set") {
-    List l;
-    Matrix a(2), res(2);
+    List<int> l;
+    Matrix<int> a(2), res(2);
     REQUIRE(l.ins_before(a) == 0);
 
     SUBCASE("cursor at the end") {
@@ -82,8 +82,8 @@ TEST_CASE("List: get and set") {
 }
 
 TEST_CASE("List: deletion") {
-    List l;
-    Matrix a(2);
+    List<int> l;
+    Matrix<int> a(2);
     for (int i = 0; i < 3; ++i) {
         REQUIRE(l.ins_before(a) == 0);
     }
@@ -115,8 +115,8 @@ TEST_CASE("List: deletion") {
 }
 
 TEST_CASE("List: sum and mul") {
-    List l;
-    Matrix a(2), b(2), res(2);
+    List<int> l;
+    Matrix<int> a(2), b(2), res(2);
     REQUIRE(l.ins_before(a) == 0);
     REQUIRE(l.ins_before(b) == 0);
 
@@ -141,8 +141,8 @@ TEST_CASE("List: sum and mul") {
 }
 
 TEST_CASE("List: copy constructor and assignment") {
-    List original;
-    Matrix a(2);
+    List<int> original;
+    Matrix<int> a(2);
     for (int i = 0; i < 3; ++i) {
         REQUIRE(original.ins_before(a) == 0);
     }
@@ -150,7 +150,7 @@ TEST_CASE("List: copy constructor and assignment") {
     original.step_forward();
 
     SUBCASE("Copy constructor") {
-        List copy(original);
+        List<int> copy(original);
         CHECK(copy.is_empty() == 0);
         CHECK(copy.at_beg() == 0);
         CHECK(copy.at_end() == 0);
@@ -164,7 +164,7 @@ TEST_CASE("List: copy constructor and assignment") {
     }
 
     SUBCASE("Assignment and self-assignment") {
-        List assigned;
+        List<int> assigned;
         assigned = original;
         CHECK(assigned.is_empty() == 0);
         CHECK(assigned.at_beg() == 0);
@@ -175,4 +175,16 @@ TEST_CASE("List: copy constructor and assignment") {
         CHECK(assigned.at_beg() == 0);
         CHECK(assigned.at_end() == 0);
     }
+}
+
+TEST_CASE("List<double>: template works with another type"){
+    List<double> l;
+    Matrix<double> a(2), b(2), res(2);
+    REQUIRE(l.ins_before(a) == 0);
+    REQUIRE(l.ins_before(b) == 0);
+
+    l.go_to_beg();
+    l.step_forward();
+    CHECK(l.sum(res) == 0);
+    CHECK(l.mul(res) == 0);
 }

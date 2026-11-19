@@ -2,13 +2,21 @@
 #define MATRIX_H
 
 #include <fstream>
+#include <iostream>
 
+template <typename T>
+class List;
+
+template <typename T>
+class Node;
+
+template <typename T>
 class Matrix {
 private:
     int n;
-    int** a;
-    friend class List;
-    friend class Node;
+    T** a;
+    friend class List<T>;
+    friend class Node<T>;
 
 public:
     Matrix();
@@ -23,5 +31,8 @@ public:
     Matrix operator*(const Matrix& other);
     void sledMatrix();
 };
+
+extern template class Matrix<int>;
+extern template class Matrix<double>;
 
 #endif

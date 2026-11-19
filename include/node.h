@@ -3,14 +3,22 @@
 
 #include "matrix.h"
 
+
+template <typename T>
+class List;
+
+template <typename T>
 class Node {
-    Matrix data;
+    Matrix<T> data;
     Node *prev, *next;
-    friend class List;
+    friend class List<T>;
 
 public:
     Node();
-    Node(Matrix& m);
+    Node(Matrix<T>& m);
 };
+
+extern template class Node<int>;
+extern template class Node<double>;
 
 #endif

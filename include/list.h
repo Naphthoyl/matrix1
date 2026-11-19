@@ -4,9 +4,10 @@
 #include "matrix.h"
 #include "node.h"
 
+template <typename T>
 class List {
-    Node base;
-    Node *before, *after;
+    Node<T> base;
+    Node<T> *before, *after;
 
 public:
     List();
@@ -14,26 +15,29 @@ public:
     List(const List& other);
     List& operator=(const List& other);
 
-    int ins_before(Matrix& m);
-    int ins_after(Matrix& m);
+    int ins_before(Matrix<T>& m);
+    int ins_after(Matrix<T>& m);
     int at_beg();
     int at_end();
     int is_empty();
     int del_before();
     int del_after();
-    int get_before(Matrix& num);
-    int get_after(Matrix& num);
-    int set_before(Matrix& num);
-    int set_after(Matrix& num);
+    int get_before(Matrix<T>& num);
+    int get_after(Matrix<T>& num);
+    int set_before(Matrix<T>& num);
+    int set_after(Matrix<T>& num);
     int step_forward();
     int step_backward();
     void go_to_beg();
     void go_to_end();
     void show();
 
-    int sum(Matrix& result);
-    int mul(Matrix& result);
+    int sum(Matrix<T>& result);
+    int mul(Matrix<T>& result);
     int sled();
 };
+
+extern template class List<int>;
+extern template class List<double>;
 
 #endif 

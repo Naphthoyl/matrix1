@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 
+
 #include <boost/program_options.hpp>
 
 #include "matrix.h"
@@ -47,12 +48,12 @@ int main(int argc, char** argv) {
         return -2;
     }
 
-    List ob1;
+    List<int> ob1;
 
     int n1 = 0;
     for (int k = 0; k < n; k++) {
         fin >> n1;
-        Matrix a(n1);
+        Matrix<int> a(n1);
         a.input(fin);
         ob1.ins_before(a);
     }

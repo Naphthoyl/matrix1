@@ -2,24 +2,27 @@
 
 #include <iostream>
 
-List::List() {
+template <typename T>
+List<T>::List() {
     base.prev = &base;
     base.next = &base;
     before = &base;
     after = &base;
 }
 
-List::~List() {
+template <typename T>
+List<T>::~List() {
     go_to_beg();
     while (!is_empty()) {
         del_after();
     }
 }
 
-int List::ins_before(Matrix& m) {
-    Node *new_node = nullptr;
+template <typename T>
+int List<T>::ins_before(Matrix<T>& m) {
+    Node<T> *new_node = nullptr;
     try {
-        new_node = new Node(m);
+        new_node = new Node<T>(m);
     }
     catch (...) {
         return -1;
@@ -33,10 +36,11 @@ int List::ins_before(Matrix& m) {
     return 0;
 }
 
-int List::ins_after(Matrix& m) {
-    Node *new_node = nullptr;
+template <typename T>
+int List<T>::ins_after(Matrix<T>& m) {
+    Node<T> *new_node = nullptr;
     try {
-        new_node = new Node(m);
+        new_node = new Node<T>(m);
     }
     catch (...) {
         return -1;
@@ -50,27 +54,31 @@ int List::ins_after(Matrix& m) {
     return 0;
 }
 
-int List::at_beg() {
+template <typename T>
+int List<T>::at_beg() {
     if (before == &base) return 1;
     else return 0;
 }
 
-int List::at_end() {
+template <typename T>
+int List<T>::at_end() {
     if (after == &base) return 1;
     else return 0;
 }
 
-int List::is_empty() {
+template <typename T>
+int List<T>::is_empty() {
     if (base.next == &base) return 1;
     else return 0;
 }
 
-int List::del_before() {
+template <typename T>
+int List<T>::del_before() {
     if (at_beg()) return -1;
 
-    Node *del = before;
-    Node *l = del->prev;
-    Node *r = del->next;
+    Node<T> *del = before;
+    Node<T> *l = del->prev;
+    Node<T> *r = del->next;
     l->next = r;
     r->prev = l;
     before = l;
@@ -78,12 +86,13 @@ int List::del_before() {
     return 0;
 }
 
-int List::del_after() {
+template <typename T>
+int List<T>::del_after() {
     if (at_end()) return -1;
 
-    Node *del = after;
-    Node *l = del->prev;
-    Node *r = del->next;
+    Node<T> *del = after;
+    Node<T> *l = del->prev;
+    Node<T> *r = del->next;
     l->next = r;
     r->prev = l;
     after = r;
@@ -91,35 +100,40 @@ int List::del_after() {
     return 0;
 }
 
-int List::get_before(Matrix& num) {
+template <typename T>
+int List<T>::get_before(Matrix<T>& num) {
     if (at_beg()) return -1;
 
     num = before->data;
     return 0;
 }
 
-int List::get_after(Matrix& num) {
+template <typename T>
+int List<T>::get_after(Matrix<T>& num) {
     if (at_end()) return -1;
 
     num = after->data;
     return 0;
 }
 
-int List::set_before(Matrix& num) {
+template <typename T>
+int List<T>::set_before(Matrix<T>& num) {
     if (at_beg()) return -1;
 
     before->data = num;
     return 0;
 }
 
-int List::set_after(Matrix& num) {
+template <typename T>
+int List<T>::set_after(Matrix<T>& num) {
     if (at_end()) return -1;
 
     after->data = num;
     return 0;
 }
 
-int List::step_forward() {
+template <typename T>
+int List<T>::step_forward() {
     if (at_end()) return -1;
 
     before = after;
@@ -127,7 +141,8 @@ int List::step_forward() {
     return 0;
 }
 
-int List::step_backward() {
+template <typename T>
+int List<T>::step_backward() {
     if (at_beg()) return -1;
 
     after = before;
@@ -135,18 +150,21 @@ int List::step_backward() {
     return 0;
 }
 
-void List::go_to_beg() {
+template <typename T>
+void List<T>::go_to_beg() {
     before = &base;
     after = before->next;
 }
 
-void List::go_to_end() {
+template <typename T>
+void List<T>::go_to_end() {
     after = &base;
     before = after->prev;
 }
 
-void List::show() {
-    Node* cur = base.next;
+template <typename T>
+void List<T>::show() {
+    Node<T>* cur = base.next;
     while (cur != &base) {
         cur->data.show();
         if (cur == before) std::cout << " <-before";
@@ -156,25 +174,26 @@ void List::show() {
     }
 }
 
-List::List(const List& other) {
+template <typename T>
+List<T>::List(const List<T>& other) {
     base.prev = &base;
     base.next = &base;
     before = &base;
     after = &base;
 
-    Node *new_before = &base;
-    Node *new_after = &base;
+    Node<T> *new_before = &base;
+    Node<T> *new_after = &base;
 
     go_to_end();
 
-    for (Node *temp = other.base.next; temp != &other.base; temp = temp->next) {
+    for (Node<T> *temp = other.base.next; temp != &other.base; temp = temp->next) {
         if (ins_before(temp->data) == -1) {
             go_to_beg();
             while (!is_empty()) del_after();
             return;
         }
 
-        Node *new_node = before;
+        Node<T> *new_node = before;
 
         if (temp == other.before) new_before = new_node;
         if (temp == other.after) new_after = new_node;
@@ -187,7 +206,8 @@ List::List(const List& other) {
     else after = new_after;
 }
 
-List& List::operator=(const List& other) {
+template <typename T>
+List<T>& List<T>::operator=(const List& other) {
     if (this == &other) return *this;
 
     go_to_beg();
@@ -198,19 +218,19 @@ List& List::operator=(const List& other) {
     before = &base;
     after = &base;
 
-    Node *new_before = &base;
-    Node *new_after = &base;
+    Node<T> *new_before = &base;
+    Node<T> *new_after = &base;
 
     go_to_end();
 
-    for (Node *temp = other.base.next; temp != &other.base; temp = temp->next) {
+    for (Node<T> *temp = other.base.next; temp != &other.base; temp = temp->next) {
         if (ins_before(temp->data) == -1) {
             go_to_beg();
             while (!is_empty()) del_after();
             return *this;
         }
 
-        Node *new_node = before;
+        Node<T> *new_node = before;
 
         if (temp == other.before) new_before = new_node;
         if (temp == other.after) new_after = new_node;
@@ -225,23 +245,29 @@ List& List::operator=(const List& other) {
     return *this;
 }
 
-int List::sum(Matrix& result) {
+template <typename T>
+int List<T>::sum(Matrix<T>& result) {
     if (at_beg() || at_end()) return -1;
 
     result = before->data + after->data;
     return 0;
 }
 
-int List::mul(Matrix& result) {
+template <typename T>
+int List<T>::mul(Matrix<T>& result) {
     if (at_beg() || at_end()) return -1;
 
     result = before->data * after->data;
     return 0;
 }
 
-int List::sled() {
-    for (Node *temp = base.next; temp != &base; temp = temp->next) {
+template <typename T>
+int List<T>::sled() {
+    for (Node<T> *temp = base.next; temp != &base; temp = temp->next) {
         temp->data.sledMatrix();
     }
     return 0;
 }
+
+template class List<int>;
+template class List<double>;

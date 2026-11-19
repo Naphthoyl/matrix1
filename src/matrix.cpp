@@ -2,22 +2,24 @@
 
 #include <iostream>
 
-Matrix::Matrix() : n(0), a(nullptr) {
+template <typename T>
+Matrix<T>::Matrix() : n(0), a(nullptr) {
     std::cout << "in construck Maxrix" << std::endl;
 }
 
-Matrix::Matrix(int size) : n(size), a(nullptr) {
+template <typename T>
+Matrix<T>::Matrix(int size) : n(size), a(nullptr) {
     try {
-        a = new int*[n];
+        a = new T*[n];
         for (int i = 0; i < n; i++) {
             a[i] = nullptr;
         }
 
         try {
             for (int i = 0; i < n; i++) {
-                a[i] = new int[n];
+                a[i] = new T[n];
                 for (int j = 0; j < n; j++) {
-                    a[i][j] = 0;
+                    a[i][j] = T();
                 }
             }
         }
@@ -39,7 +41,8 @@ Matrix::Matrix(int size) : n(size), a(nullptr) {
     }
 }
 
-Matrix::~Matrix() {
+template <typename T>
+Matrix<T>::~Matrix() {
     if (a != nullptr) {
         for (int i = 0; i < n; i++) {
             if (a[i]) {
@@ -50,7 +53,8 @@ Matrix::~Matrix() {
     }
 }
 
-Matrix::Matrix(const Matrix& other) : n(other.n), a(nullptr) {
+template <typename T>
+Matrix<T>::Matrix(const Matrix<T>& other) : n(other.n), a(nullptr) {
     if (other.a == nullptr || other.n == 0) {
         n = 0;
         a = nullptr;
@@ -58,14 +62,14 @@ Matrix::Matrix(const Matrix& other) : n(other.n), a(nullptr) {
     }
 
     try {
-        a = new int*[n];
+        a = new T*[n];
         for (int i = 0; i < n; i++) {
             a[i] = nullptr;
         }
 
         try {
             for (int i = 0; i < n; i++) {
-                a[i] = new int[n];
+                a[i] = new T[n];
                 for (int j = 0; j < n; j++) {
                     a[i][j] = other.a[i][j];
                 }
@@ -89,7 +93,8 @@ Matrix::Matrix(const Matrix& other) : n(other.n), a(nullptr) {
     }
 }
 
-Matrix& Matrix::operator=(const Matrix& other) {
+template <typename T>
+Matrix<T>& Matrix<T>::operator=(const Matrix<T>& other) {
     if (this == &other) {
         return *this;
     }
@@ -113,14 +118,14 @@ Matrix& Matrix::operator=(const Matrix& other) {
     }
 
     try {
-        a = new int*[n];
+        a = new T*[n];
         for (int i = 0; i < n; i++) {
             a[i] = nullptr;
         }
 
         try {
             for (int i = 0; i < n; i++) {
-                a[i] = new int[n];
+                a[i] = new T[n];
                 for (int j = 0; j < n; j++) {
                     a[i][j] = other.a[i][j];
                 }
@@ -145,7 +150,8 @@ Matrix& Matrix::operator=(const Matrix& other) {
     return *this;
 }
 
-void Matrix::input(std::ifstream& fin) {
+template <typename T>
+void Matrix<T>::input(std::ifstream& fin) {
     std::cout << "vvedite elementi" << std::endl;
     if (a == nullptr || n == 0) {
         std::cout << "Matrix is empty\n";
@@ -159,7 +165,8 @@ void Matrix::input(std::ifstream& fin) {
     }
 }
 
-void Matrix::show() {
+template <typename T>
+void Matrix<T>::show() {
     if (a == nullptr || n == 0) {
         std::cout << "Matrix is empty\n";
         return;
@@ -173,12 +180,13 @@ void Matrix::show() {
     }
 }
 
-Matrix Matrix::operator+(const Matrix& other) {
+template <typename T>
+Matrix<T> Matrix<T>::operator+(const Matrix<T>& other) {
     if (a == nullptr || other.a == nullptr || n == 0 || n != other.n) {
-        return Matrix();
+        return Matrix<T>();
     }
 
-    Matrix result(n);
+    Matrix<T> result(n);
 
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
@@ -188,16 +196,17 @@ Matrix Matrix::operator+(const Matrix& other) {
     return result;
 }
 
-Matrix Matrix::operator*(const Matrix& other) {
+template <typename T>
+Matrix<T> Matrix<T>::operator*(const Matrix<T>& other) {
     if (a == nullptr || other.a == nullptr || n == 0 || n != other.n) {
-        return Matrix();
+        return Matrix<T>();
     }
 
-    Matrix result(n);
+    Matrix<T> result(n);
 
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            int sum = 0;
+            T sum = T();
             for (int k = 0; k < n; k++) {
                 sum += a[i][k] * other.a[k][j];
             }
@@ -207,10 +216,14 @@ Matrix Matrix::operator*(const Matrix& other) {
     return result;
 }
 
-void Matrix::sledMatrix() {
-    int sum = 0;
+template <typename T>
+void Matrix<T>::sledMatrix() {
+    T sum = T();
     for (int i = 0; i < n; i++) {
         sum = sum + a[i][i];
     }
     std::cout << sum << std::endl;
 }
+
+template class Matrix<int>;
+template class Matrix<double>;
