@@ -20,20 +20,32 @@
 
 ```
 .
-├── CMakeLists.txt
-├── main.cpp            # точка входа: опции, проверка данных, чтение матриц
-├── test.cpp            # юнит-тесты (doctest)
-├── doctest.h           # библиотека тестов
-├── config.cfg          # конфиг: какой файл читать по умолчанию
-├── text.txt            # пример входных данных
+├── CMakeLists.txt      # корневой: настройки + add_subdirectory для каждой папки
 ├── include/            # заголовки: объявления классов
+│   ├── CMakeLists.txt  # interface-библиотека matrix_headers
 │   ├── matrix.h
 │   ├── node.h
 │   └── list.h
-└── src/                # реализации
-    ├── matrix.cpp
-    ├── node.cpp
-    └── list.cpp
+├── src/                # реализации
+│   ├── CMakeLists.txt  # add_subdirectory для matrix, node, list
+│   ├── matrix/
+│   │   ├── CMakeLists.txt  # библиотека matrix
+│   │   └── matrix.cpp
+│   ├── node/
+│   │   ├── CMakeLists.txt  # библиотека node
+│   │   └── node.cpp
+│   └── list/
+│       ├── CMakeLists.txt  # библиотека list
+│       └── list.cpp
+├── app/                # основная программа
+│   ├── CMakeLists.txt  # Boost (FetchContent) и исполняемый файл app
+│   ├── main.cpp        # точка входа: опции, проверка данных, чтение матриц
+│   ├── config.cfg      # конфиг: какой файл читать по умолчанию
+│   └── text.txt        # пример входных данных
+└── tests/              # юнит-тесты
+    ├── CMakeLists.txt  # исполняемый файл test
+    ├── test.cpp        # тесты (doctest)
+    └── doctest.h       # библиотека тестов
 ```
 
 Каждый класс (`Matrix`, `Node`, `List`) лежит в своей паре файлов: объявление в `include/`, реализация в `src/`.
@@ -55,9 +67,9 @@ Boost (компонент `program_options`) CMake скачает сам чер�
 
 | Файл | Что это |
 | --- | --- |
-| `app` | основная программа |
-| `test` | юнит-тесты |
-| `text.txt`, `config.cfg` | копии входных файлов, чтобы программа находила их рядом с собой |
+| `app/app` | основная программа |
+| `app/text.txt`, `app/config.cfg` | копии входных файлов, чтобы программа находила их рядом с собой |
+| `tests/test` | юнит-тесты |
 
 На MinGW программа линкуется статически (`-static`), так что для запуска не нужны посторонние DLL.
 
@@ -66,7 +78,7 @@ Boost (компонент `program_options`) CMake скачает сам чер�
 Если Boost уже установлен в системе:
 
 ```bash
-g++ -std=c++17 -Wall -Iinclude main.cpp src/matrix.cpp src/node.cpp src/list.cpp \
+g++ -std=c++17 -Wall -Iinclude app/main.cpp src/matrix/matrix.cpp src/node/node.cpp src/list/list.cpp \
     -lboost_program_options -o app
 ```
 
@@ -77,7 +89,7 @@ g++ -std=c++17 -Wall -Iinclude main.cpp src/matrix.cpp src/node.cpp src/list.cpp
 ## Запуск
 
 ```bash
-cd build
+cd build/app
 ./app                    # читает файл из config.cfg или text.txt
 ./app -f my_data.txt     # читает указанный файл
 ./app --help             # список опций
@@ -214,12 +226,12 @@ error in line 4: bad matrix row
 
 ```bash
 cmake --build build --target test
-./build/test
+./build/tests/test
 ```
 
 Или без CMake:
 
 ```bash
-g++ -std=c++17 -Iinclude test.cpp src/matrix.cpp src/node.cpp src/list.cpp -o test
+g++ -std=c++17 -Iinclude -Itests tests/test.cpp src/matrix/matrix.cpp src/node/node.cpp src/list/list.cpp -o test
 ./test
 ```
